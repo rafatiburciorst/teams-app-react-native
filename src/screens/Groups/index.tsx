@@ -5,12 +5,21 @@ import { Highlight } from '@components/Highlight';
 import { ListEmpty } from '@components/ListEmpty';
 import { useState } from 'react';
 import { FlatList } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 import { Container } from './styles';
+import { RootStackParamList } from 'src/routes/app.routes';
+import { useNavigation } from '@react-navigation/native';
+
 
 export function Groups() {
 
     const [groups, setGroups] = useState<string[]>([])
+
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+    function handleNewGroup() {
+        navigation.navigate('new')
+    }
 
     return (
         <Container>
@@ -37,6 +46,7 @@ export function Groups() {
             />
             <Button 
                 title='Criar nova turma'
+                onPress={handleNewGroup}
             />
         </Container>
     );
