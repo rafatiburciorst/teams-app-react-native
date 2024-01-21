@@ -3,14 +3,14 @@ import { GroupCard } from '@components/GroupCard';
 import { Header } from '@components/Header';
 import { Highlight } from '@components/Highlight';
 import { ListEmpty } from '@components/ListEmpty';
-import { useState } from 'react';
-import { FlatList } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { groupsGetAll } from '@storage/group/groups-get-all';
+import { useCallback, useState } from 'react';
+import { Alert, FlatList } from 'react-native';
+import { RootStackParamList } from 'src/routes/app.routes';
 
 import { Container } from './styles';
-import { RootStackParamList } from 'src/routes/app.routes';
-import { useNavigation } from '@react-navigation/native';
-
 
 export function Groups() {
 
@@ -20,6 +20,23 @@ export function Groups() {
     function handleNewGroup() {
         navigation.navigate('new')
     }
+
+    async function fetchGroups() {
+        try {
+            const data = await groupsGetAll()
+            setGroups(data)
+        } catch (error) {
+            Alert.alert('Turmas', 'Não foi possível carregar as turmas')
+        }
+    }
+
+    function handleOpenGroup(group: string) {
+        navigation.navigate('players', { group })
+    }
+
+    useFocusEffect(useCallback(() => {
+        fetchGroups()
+    }, []))
 
     return (
         <Container>
@@ -34,6 +51,7 @@ export function Groups() {
                 renderItem={({ item }) => (
                     <GroupCard
                         title={item}
+                        onPress={() => handleOpenGroup(item)}
                     />
                 )}
                 contentContainerStyle={!groups.length && { flex: 1 }}
@@ -44,7 +62,7 @@ export function Groups() {
                 )}
                 showsVerticalScrollIndicator={false}
             />
-            <Button 
+            <Button
                 title='Criar nova turma'
                 onPress={handleNewGroup}
             />
